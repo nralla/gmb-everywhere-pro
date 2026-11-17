@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "GMB Everywhere Pro",
+  "version": "3.0-REA",
+  "description": "Complete local SEO toolkit powered by GMaps DOM analysis (25+ data attributes reverse-engineered)",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["https://www.google.com/maps/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "GMB Everywhere Pro"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "128": "img/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.google.com/maps/place/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}

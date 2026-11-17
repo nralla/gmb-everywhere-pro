@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>GMB Everywhere Pro</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <header class="gmb-header">
+        <h1>📊 GMB Pro v3.0-REA</h1>
+        <small>Son güncelleme: ${new Date().toLocaleDateString('tr')}</small>
+    </header>
+    
+    <!-- Tab Navigation -->
+    <nav class="gmb-tabs">
+        <button class="tab-btn active" data-tab="0">🏢 Özet</button>
+        <button class="tab-btn" data-tab="1">📍 Teleport</button>
+        <button class="tab-btn" data-tab="2">🥊 Local Scan</button>
+        <button class="tab-btn" data-tab="3">📅 Post Audit</button>
+        <button class="tab-btn" data-tab="4">🏷️ Kategori</button>
+    </nav>
+    
+    <!-- Tab 1: Summary Dashboard -->
+    <div class="tab-panel active" id="panel-summary">
+        <div class="summary-card">
+            <h3>İşletme Bilgisi</h3>
+            <div class="info-row">
+                <span class="label">İsim:</span>
+                <strong id="biz-name">Yükleniyor...</strong>
+            </div>
+            <div class="info-row">
+                <span class="label">Place ID:</span>
+                <code id="place-id">-</code>
+            </div>
+            <div class="info-row">
+                <span class="label">Yorum Sayısı:</span>
+                <strong id="review-count">-</strong>
+            </div>
+            <div class="info-row">
+                <span class="label">Kategoriler:</span>
+                <div id="category-list"></div>
+            </div>
+        </div>
+        
+        <div class="health-score-card">
+            <h3>SEO Sağlık Skoru</h3>
+            <div class="score-display">
+                <span class="score-value" id="health-score-value">--</span>
+                <span class="score-max">/100</span>
+            </div>
+            <div id="health-factors"></div>
+            <button class="btn-primary" id="calc-health-score">Skor Hesapla</button>
+        </div>
+        
+        <button class="btn-secondary" id="export-data">📥 Tüm Veriyi İndir</button>
+    </div>
+    
+    <!-- Tab 2: Teleport / Rank Tracker -->
+    <div class="tab-panel" id="panel-teleport">
+        <div class="teleport-card">
+            <h3>📍 Sıralama Takipçisi</h3>
+            
+            <div class="input-group">
+                <label>Anahtar Kelime</label>
+                <input type="text" id="teleport-keyword" placeholder="ör: dermatolog antalya" />
+            </div>
+            
+            <div class="row-inputs">
+                <div class="input-group">
+                    <label>Koordinat Lat</label>
+                    <input type="number" step="any" id="teleport-lat" placeholder="36.8630" />
+                </div>
+                <div class="input-group">
+                    <label>Koordinat Lng</label>
+                    <input type="number" step="any" id="teleport-lng" placeholder="30.7294" />
+                </div>
+            </div>
+            
+            <button class="btn-primary" id="check-rank">Sıralamayı Kontrol Et</button>
+            <div id="rank-status" class="status-info">Koordinat girerek sıralamayı kontrol edin</div>
+            <div id="rank-details"></div>
+        </div>
+        
+        <div id="scan-history"></div>
+    </div>
+    
+    <!-- Tab 3: Local Competitor Scanner -->
+    <div class="tab-panel" id="panel-local-scan">
+        <div class="local-scan-card">
+            <h3>🥊 Rakip Analizi</h3>
+            
+            <div class="input-group">
+                <label>Arama Anahtarı</label>
+                <input type="text" id="local-keyword" placeholder="ör: saç ekim kliniği" />
+            </div>
+            
+            <div class="input-group">
+                <label>Yarıçap (metre)</label>
+                <input type="range" id="local-radius" min="500" max="5000" value="2000" step="100" />
+                <small id="radius-display">2000m</small>
+            </div>
+            
+            <button class="btn-primary" id="start-local-scan">Taramayı Başlat</button>
+            <div id="scan-status" class="status-info">Anahtar kelime ve yarıçap belirleyin</div>
+            
+            <div id="competitor-list"></div>
+        </div>
+    </div>
+    
+    <!-- Tab 4: Post Audit History -->
+    <div class="tab-panel" id="panel-post-audit">
+        <div class="post-audit-card">
+            <h3>📅 Gönderi Geçmişi</h3>
+            
+            <button class="btn-primary" id="run-post-audit">Gönderileri Tarayın</button>
+            <div id="post-status" class="status-info">Geçmiş gönderileri analiz etmeye başlayın</div>
+            
+            <div id="post-history-container"></div>
+        </div>
+    </div>
+    
+    <!-- Tab 5: Category Traffic Volume -->
+    <div class="tab-panel" id="panel-category">
+        <div class="category-card">
+            <h3>🏷️ Kategori Trafik Hacmi</h3>
+            
+            <div class="input-group">
+                <label>Seçilen Kategori</label>
+                <select id="category-select">
+                    <option value="dermatolog">Dermatolog</option>
+                    <option value="güzellik merkezi" selected>Güzellik Merkezi</option>
+                    <option value="saç ekim kliniği">Saç Ekim Kliniği</option>
+                    <option value="estetik doktor">Estetik Doktor</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label>Veya özel kategori yazın</label>
+                <input type="text" id="category-input" placeholder="Veya buraya yazın..." />
+            </div>
+            
+            <button class="btn-primary" id="get-category-volume">Trafik Hacmini Ölç</button>
+            <div id="category-status" class="status-info">Bir kategori seçip ölçün</div>
+            
+            <div id="category-results"></div>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+    <script src="popup-panels.js"></script>
+</body>
+</html>
