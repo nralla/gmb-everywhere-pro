@@ -1,28 +1,37 @@
-// GMB Everywhere Pro — Popup Dashboard (v3.0-REA)
+// ═══════════════════════════════════════════════════════
+// GMB EVERYWHERE PRO v3.0-REA — POPUP DASHBOARD
+// Tüm REA bulgularından beslenen yerel SEO analitik aracı
+// Karşılık gelen .md dosyasında her attribute için detay bulunur
+// ═══════════════════════════════════════════════════════
+
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('[GMB Pro] Popup loaded');
+    console.log('[GMB Pro] Açılma arayüzü hazırlandı');
     
-    // Initialize UI
+    // Sekmeleri ve panelleri hazırla
     initTabs();
     loadExtractedData();
     
-    // Bind all button handlers
+    // Tüm butonlara tıklama olayı bağla
     bindAllHandlers();
 });
 
+/**
+ * Sekme geçişlerini yönetir: tıklandığında ilgili paneli gösterir
+ */
 function initTabs() {
     const tabButtons = document.querySelectorAll('.tab-btn');
     const panels = document.querySelectorAll('.tab-panel');
     
     tabButtons.forEach((btn, index) => {
         btn.addEventListener('click', () => {
+            // Önceki sekmeleri kapat
             tabButtons.forEach(b => b.classList.remove('active'));
             panels.forEach(p => p.classList.remove('active'));
             
+            // Yeni sekme aktif et + panel verisini yükle
             btn.classList.add('active');
             panels[index].classList.add('active');
             
-            // Load panel-specific data
             if (index === 0) loadSummaryPanel();
             if (index === 1) loadTeleportPanel();
             if (index === 2) loadLocalScanPanel();
@@ -32,18 +41,27 @@ function initTabs() {
     });
 }
 
+/**
+ * Extracted verisini Chrome storage'ndan yükle
+ * Eğer işletme sayfasında çalışmıyorsa demo veri üretir
+ */
 function loadExtractedData() {
     chrome.storage.local.get(['gmbExtracted'], (result) => {
         window._extracted = result.gmbExtracted || {};
         
         if (!window._extracted.businessName) {
-            // Generate demo data for testing
+            // Üretici sunucu olmadığı için demo veri oluştur
             window._extracted = generateDemoData();
         }
         
-        console.log('[GMB Pro] Data loaded:', Object.keys(window._extracted));
+        console.log('[GMB Pro] Veri yüklendi:', Object.keys(window._extracted));
     });
 }
+
+/**
+ * Demo/örnek işletme verisi üretir
+ * Gerçek kullanımda Google Maps'ten gelen gerçek verilerle değişecek
+ */
 
 function generateDemoData() {
     return {
@@ -93,9 +111,16 @@ function bindAllHandlers() {
     document.getElementById('export-data')?.addEventListener('click', exportAllData);
 }
 
-// ============================================
-// HEALTH SCORE CALCULATOR
-// ============================================
+/**
+ * Sağlık skoru hesaplayıcı
+ * 6 faktör üzerinden işletmenin Google Maps SEO performansını değerlendirir:
+ * 1. Profil Eksiksizliği (adres/telefon/web)
+ * 2. Yorum Miktarı Kalitesi  
+ * 3. Kategori Doğruluğu
+ * 4. Fotoğraf Yoğunluğu
+ * 5. Yorumlara Yanıt Oranı
+ * 6. Gönderi Aktifliği
+ */
 function calculateHealthScore() {
     const scoreEl = document.getElementById('health-score-value');
     const factorsEl = document.getElementById('health-factors');

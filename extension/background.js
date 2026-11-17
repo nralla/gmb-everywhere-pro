@@ -1,54 +1,68 @@
-// GMB Everywhere Pro — Service Worker (Background)
-console.log('[GMB Pro] Background service worker started');
+// ═══════════════════════════════════════════════════════
+// GMB EVERYWHERE PRO v3.1-TR — ARKA PLAN HİZMET ÇALIŞANI
+// İleti yönlendirme, kurulum ve veri çekme yardımcıları
+// ═══════════════════════════════════════════════════════
+console.log('[GMB Pro] Arka plan hizmeti başlatıldı');
 
-// Listen for messages from content scripts
+/**
+ * İçerik komut dosyalarından gelen mesajları dinler
+ * - openPopup: Toolbar butonuna tıklayınca popup açar
+ * - extractData: İşletme verisini anında çeker
+ */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'openPopup') {
-        // Open extension popup when user clicks the toolbar button
-        chrome.action.openPopup().catch(err => console.warn('Popup open failed:', err));
-        return true; // Keep message channel open for async response
+        // Kullanıcı toolbar'a tıklayınca popup açılır
+        chrome.action.openPopup().catch(err => console.warn('Açılma aracı açılamadı:', err));
+        return true; // Asenkron yanıt için kanal açık tutulur
     }
     
     if (message.action === 'extractData' && sender.tab?.url?.includes('/maps/place/')) {
-        // Trigger extraction on demand
+        // İstenildiğinde işletme verisi çıkarımı tetiklenir
         extractBusinessData(sender.tab.id).then(data => {
             sendResponse({ success: true, data });
         }).catch(err => {
             sendResponse({ success: false, error: err.message });
         });
-        return true; // Keep channel open for async response
+        return true; // Asenkron yanıt için kanal açık tutulur
     }
 });
 
-// On install/setup
+/**
+ * Eklenti kurulduğunda veya güncellendiğinde çalışır
+ * Varsayılan ayarları ve sürüm bilgisini depolar
+ */
 chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === 'install') {
-        console.log('[GMB Pro] Installed!');
-        // Set default values
+        console.log('[GMB Pro] Yükleme tamamlandı!');
+        // Varsayılan değerleri ayarla
         chrome.storage.local.set({
-            version: '3.0-REA',
+            version: '3.1-TR',
             lastUpdate: Date.now(),
             settings: {
-                autoExtract: true,
-                notifyOnNewReviews: true,
-                exportFormat: 'json'
+                autoExtract: true,         // Otomatik veri çekimi aktif
+                notifyOnNewReviews: true,  // Yeni yorum bildirimleri açık
+                exportFormat: 'json'       // Dışa aktarma formatı
             }
         });
     } else if (details.reason === 'update') {
-        console.log('[GMB Pro] Updated to v' + chrome.runtime.getManifest().version);
+        console.log('[GMB Pro] Güncelleme: v' + chrome.runtime.getManifest().version);
     }
 });
 
-// Extract business data helper (used by content script interactions)
+/**
+ * İşletme verisi çıkarma yardımcısı
+ * Content script'ten çağrıldığında Google Maps sayfasındaki verileri çeker
+ * REA analizinde keşfedilen @data-* özniteliklerini sistematik olarak toplar
+ */
 async function extractBusinessData(tabId) {
     try {
-        // Evaluate extraction code in the active tab
+        // Aktif sekmede çıkarma kodunu çalıştır
         const results = await chrome.scripting.executeScript({
             target: { tabId },
             func: () => {
                 const data = {};
                 
-                // URL parsing
+                // URL'den Place ID parse et
                 const urlMatch = window.location.href.match(/place\/([^\/]+)/);
                 if (urlMatch) {
                     data.placeIdRaw = decodeURIComponent(urlMatch[1]);
@@ -57,12 +71,12 @@ async function extractBusinessData(tabId) {
                     );
                 }
                 
-                // Business name extraction via multiple selectors
+                // Birden fazla CSS seçicisiyle işletme ismini bul
                 const nameSelectors = [
-                    '[aria-label*="name"]',
-                    '.V4w58e',
-                    '.LUV9rb',
-                    'h1'
+                    '[aria-label*="name"]',     // ARIA etiketli isim
+                    '.V4w58e',                  // GMaps ana başlık sınıfı
+                    '.LUV9rb',                  // Alternatif başlık
+                    'h1'                        // Son çare: h1 etiketi
                 ];
                 
                 for (const sel of nameSelectors) {
@@ -73,7 +87,8 @@ async function extractBusinessData(tabId) {
                     }
                 }
                 
-                // Data attribute collection
+                // Tüm @data-* özniteliklerini topla
+                // REA bulgularına göre: 25 farklı @data-* türü tespit edildi
                 data.dataAttributes = {};
                 document.querySelectorAll('*').forEach(el => {
                     Array.from(el.attributes).forEach(attr => {
@@ -90,7 +105,7 @@ async function extractBusinessData(tabId) {
                     });
                 });
                 
-                // Review IDs
+                // Review ID'lerini topla (protobuf-encoded base64 stringler)
                 data.reviewIds = [];
                 document.querySelectorAll('[data-review-id]').forEach(el => {
                     const rid = el.getAttribute('data-review-id');
@@ -106,7 +121,7 @@ async function extractBusinessData(tabId) {
         return results[0]?.result || {};
         
     } catch (err) {
-        console.error('[GMB Pro] Extraction failed:', err);
+        console.error('[GMB Pro] Veri çıkarma başarısız:', err);
         throw err;
     }
 }

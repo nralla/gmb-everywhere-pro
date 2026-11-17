@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "GMB Everywhere Pro",
-  "version": "3.0-REA",
-  "description": "Complete local SEO toolkit powered by GMaps DOM analysis (25+ data attributes reverse-engineered)",
+  "name": "GMB Everywhere Pro — Yerel SEO Aracı",
+  "version": "3.1-TR",
+  "description": "Google Maps DOM analizinden beslenen kapsamlı yerel SEO araç seti. GMaps'in 25+ @data-* özniteliği tersine mühendislikle çıkarıldı ve eklentiye entegre edildi.",
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": ["https://www.google.com/maps/*"],
   "action": {

@@ -1,6 +1,9 @@
-// GMB Everywhere Pro — Content Script
-// Deep DOM integration using reverse-engineered @data-* attributes
-console.log('[GMB Pro] Content script loaded');
+// ═══════════════════════════════════════════════════════
+// GMB EVERYWHERE PRO v3.1-TR — İÇERİK KOMUT DOSYASI
+// Google Maps sayfasına GMB toolbar enjekte eder
+// Tüm extraction mantığı REA analizinden beslenir
+// ═══════════════════════════════════════════════════════
+console.log('[GMB Pro] İçerik komutu yüklendi');
 
 // Detect GMaps page and inject toolbar
 (function() {
